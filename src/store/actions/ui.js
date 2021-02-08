@@ -1,0 +1,2 @@
+export const UI_CLOSE_DIALOG = 'UI_CLOSE_DIALOG'
+export const UI_OPEN_DIALOG = 'UI_OPEN_DIALOG'
