@@ -18,14 +18,14 @@
                 <v-text-field
                     label="Имя*"
                     required
-                    v-model="user.username"
+                    v-model="username"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
                     label="Почта*"
                     required
-                    v-model="user.email"
+                    v-model="email"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
@@ -33,7 +33,7 @@
                     label="Пароль*"
                     type="password"
                     required
-                    v-model="user.password"
+                    v-model="password"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -45,21 +45,21 @@
           <v-btn
               color="blue darken-1"
               text
-              @click="closeRegistration(false)"
+              @click="closeDialog"
           >
             Закрыть
           </v-btn>
           <v-btn
               color="blue darken-1"
               text
-              @click="switchDialog"
+              @click="switchToLogin"
           >
             Войти
           </v-btn>
           <v-btn
               color="blue darken-1"
               text
-              @click="registrationUser"
+              @click="signUp"
           >
             Зарегистрироваться
           </v-btn>
@@ -71,33 +71,36 @@
 </template>
 
 <script>
+import {mapMutations, mapActions} from 'vuex'
+import {UI_CLOSE_DIALOG, UI_OPEN_DIALOG} from "@/store/actions/ui";
+import {AUTH_SIGNUP_REQUEST} from "@/store/actions/auth";
+import {DialogType} from '@/store/modules/ui'
+
 export default {
   name: "DialogRegistration",
-  watch: {},
-  computed: {
-    registration: {
-      get() {
-        return this.$store.state.dialogRegistration
-      },
-      set(value) {
-        this.closeRegistration(value)
-      }
-    },
-    user() {
-      return this.$store.state.user
-    },
-  },
-  methods: {
-    registrationUser: function () {
-      this.$store.dispatch('REGISTRATION_USER')
-    },
-    switchDialog: function () {
-      this.$store.commit('switchDialogs')
-    },
-    closeRegistration(value) {
-      this.$store.commit('updateDialogRegistration', value)
-    }
 
+  data () {
+    return {
+      username: '',
+      email: '',
+      password: ''
+    }
+  },
+
+  methods: {
+    ...mapActions('auth', [AUTH_SIGNUP_REQUEST]),
+    ...mapMutations('ui', [UI_CLOSE_DIALOG, UI_OPEN_DIALOG]),
+    closeDialog () {
+      this.UI_CLOSE_DIALOG()
+    },
+    signUp () {
+      // TODO: validate form
+      const { username, email, password } = this
+      this.AUTH_SIGNUP_REQUEST({ username, email, password })
+    },
+    switchToLogin () {
+      this.UI_OPEN_DIALOG(DialogType.login)
+    }
   }
 }
 </script>
