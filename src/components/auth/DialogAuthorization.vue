@@ -1,17 +1,19 @@
 <template>
   <div>
     <v-dialog
-        v-model="authorization"
+        :value="isDialogActive"
         temporary
         max-width="600px"
+        @click:outside="closeDialog"
+        @keydown.esc="closeDialog"
     >
 
       <v-card
-      :loading="vLoginLoading">
+          :loading="this.isSigningIn()">
         <v-card-title>
           <span class="headline">Авторизация</span>
         </v-card-title>
-        <v-alert type="error" v-if="vLoginAlert">
+        <v-alert type="error" v-if="this.isSignInErrored()">
           Ошибка - введите верный логин или пароль.
         </v-alert>
         <v-card-text>
@@ -21,7 +23,7 @@
                 <v-text-field
                     label="Логин*"
                     required
-                    v-model="user.username"
+                    v-model="username"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
@@ -29,7 +31,7 @@
                     label="Пароль*"
                     type="password"
                     required
-                    v-model="user.password"
+                    v-model="password"
                 ></v-text-field>
               </v-col>
 
@@ -42,21 +44,21 @@
           <v-btn
               color="blue darken-1"
               text
-              @click="closeAuthorization(false)"
+              @click="closeDialog"
           >
             Закрыть
           </v-btn>
           <v-btn
               color="blue darken-1"
               text
-              @click="switchDialog"
+              @click="switchToSignUp"
           >
             Зарегистрироваться
           </v-btn>
           <v-btn
               color="blue darken-1"
               text
-              @click="authorizationUser"
+              @click="signIn"
           >
             Войти
           </v-btn>
@@ -68,39 +70,43 @@
 
 <script>
 
+import {UI_CLOSE_DIALOG, UI_OPEN_DIALOG} from "@/store/actions/ui";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
+import {AUTH_SIGNIN_REQUEST} from "@/store/actions/auth";
+import {DialogType} from "@/store/modules/ui";
+
 export default {
   name: "DialogAuthorization",
-  computed: {
-    authorization: {
-      get() {
-        return this.$store.state.dialogAuthorization
-      },
-      set(value) {
-        this.closeAuthorization(value)
-      }
-    },
-    user() {
-      return this.$store.state.user
-    },
-    vLoginAlert(){
-      return this.$store.state.vBadLoginAlert
-    },
-    vLoginLoading(){
-      return this.$store.state.vNewLoginLoading
-    }
 
+  data() {
+    return {
+      username: '',
+      password: ''
+    }
   },
-  methods: {
-    authorizationUser: function () {
-      this.$store.dispatch('AUTHORIZATION_USER')
-    },
-    switchDialog: function () {
-      this.$store.commit('switchDialogs')
-    },
-    closeAuthorization(value) {
-      this.$store.commit('updateDialogAuthorization', value)
-    }
 
+  computed: {
+    ...mapState('ui', ['dialog']),
+    isDialogActive: function () {
+      return this.dialog === DialogType.login
+    }
+  },
+
+  methods: {
+    ...mapActions('auth', [AUTH_SIGNIN_REQUEST]),
+    ...mapGetters('auth', ['isSigningIn', 'isSignInErrored']),
+    ...mapMutations('ui', [UI_CLOSE_DIALOG, UI_OPEN_DIALOG]),
+    closeDialog() {
+      this.UI_CLOSE_DIALOG()
+    },
+    signIn() {
+      // TODO: validate form
+      const {username, password} = this
+      this.AUTH_SIGNIN_REQUEST({username, password})
+    },
+    switchToSignUp() {
+      this.UI_OPEN_DIALOG(DialogType.signup)
+    }
   }
 }
 </script>
