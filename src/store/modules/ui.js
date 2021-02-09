@@ -1,4 +1,4 @@
-import {UI_CLOSE_DIALOG, UI_OPEN_DIALOG} from "@/store/actions/ui";
+import {UI_CLOSE_DIALOG, UI_OPEN_DIALOG, UI_TOGGLE_LEFT_MENU} from "@/store/actions/ui";
 
 export class DialogType {
     static none = new DialogType('none')
@@ -21,7 +21,7 @@ export class DialogType {
 const namespaced = true
 
 // TODO: add a field for search input
-const state = { viewLeftMenu: false, dialog: DialogType.none }
+const state = { isLeftMenuActive: false, dialog: DialogType.none }
 
 const mutations = {
     [UI_CLOSE_DIALOG]: (state) => {
@@ -29,6 +29,9 @@ const mutations = {
     },
     [UI_OPEN_DIALOG]: (state, dialogType) => {
         state.dialog = dialogType
+    },
+    [UI_TOGGLE_LEFT_MENU]: (state) => {
+        state.isLeftMenuActive = !state.isLeftMenuActive
     }
 }
 
