@@ -1,7 +1,7 @@
 import {
-    AUTH_LOGIN_ERROR,
-    AUTH_LOGIN_REQUEST,
-    AUTH_LOGIN_SUCCESS,
+    AUTH_SIGNIN_ERROR,
+    AUTH_SIGNIN_REQUEST,
+    AUTH_SIGNIN_SUCCESS,
     AUTH_LOGOUT_ERROR,
     AUTH_LOGOUT_REQUEST,
     AUTH_LOGOUT_SUCCESS,
@@ -16,20 +16,23 @@ const namespaced = true
 
 const state = {status: '', token: ''}
 
-// TODO: add getters like isLogging and isSigningUp (boolean) to make buttons disabled
+const getters = {
+    isSigningIn: state => state.status === 'signing in',
+    isSignInErrored: state => state.status === 'sign in error'
+}
 
 // TODO: (proposal) rewrite state status field as enum like ui/DialogType
 const mutations = {
-    [AUTH_LOGIN_REQUEST]: (state) => {
-        state.status = 'logging in'
+    [AUTH_SIGNIN_REQUEST]: (state) => {
+        state.status = 'signing in'
     },
-    [AUTH_LOGIN_SUCCESS]: (state, token) => {
-        state.status = 'login success'
+    [AUTH_SIGNIN_SUCCESS]: (state, token) => {
+        state.status = 'sign in success'
         state.token = token
     },
     // TODO: add error description
-    [AUTH_LOGIN_ERROR]: (state) => {
-        state.status = 'login error'
+    [AUTH_SIGNIN_ERROR]: (state) => {
+        state.status = 'sign in error'
     },
     [AUTH_SIGNUP_REQUEST]: (state) => {
         state.status = 'signing up'
@@ -43,38 +46,38 @@ const mutations = {
         state.status = 'sign up error'
     },
     [AUTH_LOGOUT_REQUEST]: (state) => {
-        state.status = 'logging out'
+        state.status = 'signing out'
     },
     [AUTH_LOGOUT_SUCCESS]: (state) => {
-        state.status = 'logout success'
+        state.status = 'sign out success'
         state.token = ''
     },
     // TODO: add error description
     [AUTH_LOGOUT_ERROR]: (state) => {
-        state.status = 'logout error'
+        state.status = 'sign out error'
     }
 }
 
 const actions = {
-    [AUTH_LOGIN_REQUEST]: async ({commit, dispatch}, userLogin) => {
-        commit(AUTH_LOGIN_REQUEST)
+    [AUTH_SIGNIN_REQUEST]: async ({commit}, userLogin) => {
+        commit(AUTH_SIGNIN_REQUEST)
         try {
             let response = await apiCall('auth/login', 'post', userLogin)
-            commit(AUTH_LOGIN_SUCCESS, response.token)
-            dispatch('ui/' + UI_CLOSE_DIALOG, null, { root: true })
+            commit(AUTH_SIGNIN_SUCCESS, response.token)
+            commit('ui/' + UI_CLOSE_DIALOG, null, { root: true })
         } catch (error) {
             // TODO: handle error in ui in ui
-            commit(AUTH_LOGIN_ERROR)
-            console.error(AUTH_LOGIN_REQUEST, error)
+            commit(AUTH_SIGNIN_ERROR)
+            console.error(AUTH_SIGNIN_REQUEST, error)
         }
     },
 
-    [AUTH_SIGNUP_REQUEST]: async ({commit, dispatch}, userSignup) => {
+    [AUTH_SIGNUP_REQUEST]: async ({commit}, userSignup) => {
         commit(AUTH_SIGNUP_REQUEST)
         try {
             let response = await apiCall('register', 'post', userSignup)
             commit(AUTH_SIGNUP_SUCCESS, response.token)
-            dispatch('ui/' + UI_CLOSE_DIALOG, null, { root: true })
+            commit('ui/' + UI_CLOSE_DIALOG, null, { root: true })
         } catch (error) {
             // TODO: handle error in ui
             commit(AUTH_SIGNUP_ERROR)
@@ -99,6 +102,7 @@ const actions = {
 export default {
     namespaced,
     state,
+    getters,
     mutations,
     actions
 }
