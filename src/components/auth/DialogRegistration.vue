@@ -1,9 +1,11 @@
 <template>
   <div>
     <v-dialog
-        v-model="registration"
+        :value="isDialogActive"
         temporary
         max-width="600px"
+        @click:outside="closeDialog"
+        @keydown.esc="closeDialog"
     >
       <v-card>
         <v-card-title>
@@ -71,7 +73,7 @@
 </template>
 
 <script>
-import {mapMutations, mapActions} from 'vuex'
+import {mapMutations, mapActions, mapState} from 'vuex'
 import {UI_CLOSE_DIALOG, UI_OPEN_DIALOG} from "@/store/actions/ui";
 import {AUTH_SIGNUP_REQUEST} from "@/store/actions/auth";
 import {DialogType} from '@/store/modules/ui'
@@ -84,6 +86,13 @@ export default {
       username: '',
       email: '',
       password: ''
+    }
+  },
+
+  computed: {
+    ...mapState('ui', ['dialog']),
+    isDialogActive : function () {
+      return this.dialog === DialogType.signup
     }
   },
 
