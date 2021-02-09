@@ -6,11 +6,10 @@
         src="https://i.ibb.co/DVDjNkn/ledentsy-konfety-sladkoe-136061-1920x1080.jpg"
     >
 
-      <v-app-bar-nav-icon @click="openLeftMenu(true)" style="color: black"></v-app-bar-nav-icon>
-
+      <v-app-bar-nav-icon @click="openLeftMenu" style="color: black"></v-app-bar-nav-icon>
 
       <v-btn icon>
-        <v-icon color="black" @click="switchAuthorization">mdi-account-circle</v-icon>
+        <v-icon color="black" @click="openSignInDialog">mdi-account-circle</v-icon>
       </v-btn>
 
       <v-btn icon @click="$vuetify.theme.dark =!$vuetify.theme.dark">
@@ -41,17 +40,21 @@
 import DialogRegistration from "@/components/auth/DialogAuthorization";
 import DialogAuthorization from "@/components/auth/DialogRegistration";
 import LeftMenu from "@/components/bar_leftmenu/LeftMenu";
+import {UI_OPEN_DIALOG, UI_TOGGLE_LEFT_MENU} from "@/store/actions/ui";
+import {DialogType} from "@/store/modules/ui";
+import {mapMutations} from "vuex";
 
 export default {
   components: {LeftMenu, DialogAuthorization, DialogRegistration},
   name: "MainPage",
 
   methods: {
-    switchAuthorization: function () {
-      this.$store.commit('updateDialogAuthorization', true)
+    ...mapMutations('ui', [UI_OPEN_DIALOG, UI_TOGGLE_LEFT_MENU]),
+    openSignInDialog() {
+      this.UI_OPEN_DIALOG(DialogType.login)
     },
-    openLeftMenu(value) {
-      this.$store.commit('updateLeftMenuDrawer', value)
+    openLeftMenu() {
+      this.UI_TOGGLE_LEFT_MENU()
     }
   }
 

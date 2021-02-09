@@ -1,9 +1,10 @@
 <template>
   <v-navigation-drawer
-      v-model="drawer"
+      :value="isLeftMenuActive"
       absolute
       temporary
       width="180px"
+      @input="toggle"
   >
 
     <v-list
@@ -69,18 +70,22 @@
 </template>
 
 <script>
+import {mapMutations, mapState} from "vuex";
+import {UI_TOGGLE_LEFT_MENU} from "@/store/actions/ui";
+
 export default {
 name: "LeftMenu",
-  computed: {
-    drawer: {
-      get() {
-        return this.$store.state.leftMenuDrawer
-      },
-      set(value) {
-        this.$store.commit('updateLeftMenuDrawer', value)
+  computed: mapState('ui', ['isLeftMenuActive']),
+
+  methods: {
+    ...mapMutations('ui', [UI_TOGGLE_LEFT_MENU]),
+    toggle(e) {
+      // v-navigation-drawer on outside click emits an event with false as payload
+      if (!e) {
+        this.UI_TOGGLE_LEFT_MENU()
       }
     }
-  },
+  }
 }
 </script>
 
